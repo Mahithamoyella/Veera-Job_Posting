@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: veera_job_posting_postgres
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin834
+      POSTGRES_DB: job_post
+    ports:
+      - "5472:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    container_name: veera_job_posting_backend
+    build: ./Backend
+    ports:
+      - "3074:3074"
+    depends_on:
+      - postgres
+
+  frontend:
+    container_name: veera_job_posting_frontend
+    build: ./Fronted
+    ports:
+      - "8099:80"
+    depends_on:
+      - backend
+
+  hr:
+    container_name: veera_job_posting_hr
+    build: ./Hr
+    ports:
+      - "8100:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+
